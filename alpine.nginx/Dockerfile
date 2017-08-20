@@ -118,8 +118,6 @@ ARG CUSTOM_PKGS=" \
     icu \
     libpq"
 
-COPY rootfs /
-
 RUN NB_CORES=${BUILD_CORES-$(getconf _NPROCESSORS_CONF)} \
 
 ### Packages installation
@@ -152,6 +150,7 @@ RUN NB_CORES=${BUILD_CORES-$(getconf _NPROCESSORS_CONF)} \
     gd \
     pcre \
     zlib \
+    nano \
     ${CUSTOM_PKGS}
 
 ### Source downloading
@@ -184,6 +183,9 @@ RUN mv /usr/src/php-${PHP_VER} /usr/src/php \
  && make -j ${NB_CORES} \
  && make install
 
+COPY rootfs /
+
+ 
 ### Strip, clean, install modules
 RUN cd /usr/src/php \
  && { find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; } \
@@ -195,3 +197,16 @@ RUN cd /usr/src/php \
  && apk del ${BUILD_DEPS} \
  && rm -rf /tmp/* /var/cache/apk/* /usr/src/* \
  && mkdir -p /nginx/logs /nginx/run /php/php-fpm.d /php/logs /php/run /php/session
+
+EXPOSE 80
+
+ENV UID=1000 GID=1000 \
+    UPLOAD_MAX_SIZE=1G \
+    APC_SHM_SIZE=128M \
+    OPCACHE_MEM_SIZE=128 \
+    MEMORY_LIMIT=512M
+
+# webserver root directory
+WORKDIR /html
+
+CMD ["run.sh"]
