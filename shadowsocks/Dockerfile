@@ -52,3 +52,6 @@ RUN apk upgrade --update \
 shadowsocks-libev-$SS_LIBEV_VERSION \
         simple-obfs \
         /var/cache/apk/*
+
+ADD entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
