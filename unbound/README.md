@@ -12,9 +12,8 @@ $ unbound-anchor -v
 $ dig @127.0.0.1:853 dnssec.works +dnssec
 
 Validate DNSSEC according to https://docs.menandmice.com/display/MM/How+to+test+DNSSEC+validation
-
  
-## test queries
+### test queries
 
 DNSSEC ok
     $ dig @127.0.0.1:853 dnssec.works +dnssec +multi
@@ -25,6 +24,11 @@ DNSSEC failed
 non DNSSEC
     $ dig @127.0.0.1:853 google.com +dnssec +multi
 
+## DNS-over-TLS
+
+test with:
+    kdig -d @89.163.224.201 +tls-ca +dnssec +multi dnssec.works
+    
 ## References
 * https://dnsprivacy.org/wiki/
 * https://unbound.net/documentation/howto_anchor.html

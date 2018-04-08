@@ -11,7 +11,8 @@ ADD unbound.conf /etc/unbound/unbound.conf
 ADD start.sh /start.sh
 RUN chmod +x /start.sh
 
-EXPOSE 853/udp
 EXPOSE 853
+EXPOSE 53/udp
+EXPOSE 53
 
 CMD ["/start.sh"]
