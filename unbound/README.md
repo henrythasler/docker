@@ -1,5 +1,9 @@
 # secure unbound DNS resolver
 
+## Security implications
+
+Running an open DNS resolver has [severe security implications](https://www.tripwire.com/state-of-security/security-data-protection/cyber-security/dns-amplification-protecting-unrestricted-open-dns-resolvers/). Please consider to NOT make the resolver publicly available.
+
 ## build and run docker image
 $ docker build -t="img-unbound:0.2" .
 $ docker run --rm -ti -p 853:853 -p 853:853/udp img-unbound:0.2
