@@ -2,9 +2,9 @@ unbound:
   container_name: unbound
   image: img-unbound:0.2
   ports:
-    - "53:53"
-    - "53:53/udp"
-    - "853:853"
+    - "127.0.0.1:53:53"
+    - "127.0.0.1:53:53/udp"
+    - "127.0.0.1:853:853"
   volumes:
     - /var/www/letsencrypt/etc:/etc/letsencrypt:ro
     

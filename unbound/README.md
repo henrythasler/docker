@@ -7,6 +7,7 @@ Running an open DNS resolver has [severe security implications](https://www.trip
 ## build and run docker image
 $ docker build -t="img-unbound:0.2" .
 $ docker run --rm -ti -p 853:853 -p 853:853/udp img-unbound:0.2
+$ docker run --rm -ti -v /var/www/letsencrypt/etc:/etc/letsencrypt:ro img-unbound:0.2
 
 ## DNSSEC
 $ unbound-anchor -v
