@@ -2,7 +2,7 @@
 
 ## Security implications
 
-Running an open DNS resolver has [severe security implications](https://www.tripwire.com/state-of-security/security-data-protection/cyber-security/dns-amplification-protecting-unrestricted-open-dns-resolvers/). Please consider to NOT make the resolver publicly available.
+Running an open (i.e. available for everyone on the internet) DNS resolver has [severe security implications](https://www.tripwire.com/state-of-security/security-data-protection/cyber-security/dns-amplification-protecting-unrestricted-open-dns-resolvers/). Please consider to NOT make the resolver publicly available. You can [test your dns resolver](www.openresolver.com) after setup to make sure it is not public.
 
 ## build and run docker image
 $ docker build -t="img-unbound:0.2" .
