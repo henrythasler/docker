@@ -27,6 +27,7 @@ RUN apk add --virtual .build-deps \
         harfbuzz-dev \
         python3-dev \
         cairo-dev \
+        py3-cairo \
         jpeg-dev \
         tiff-dev \
         icu \
@@ -52,10 +53,17 @@ RUN cd mapnik-v$MAPNIK_VERSION \
     && make install
 
 #RUN git clone https://github.com/mapnik/python-mapnik.git
+RUN git clone --branch $PYTHON_MAPNIK_VERSION --single-branch --depth=1 https://github.com/mapnik/python-mapnik.git
+
+RUN cd python-mapnik \
+    && python3 setup.py install
+
+RUN cd python-mapnik \
+    && python3 setup.py test || true
 
 # install python-bindings for mapnik from source
-RUN git clone --branch $PYTHON_MAPNIK_VERSION --single-branch --depth=1 https://github.com/mapnik/python-mapnik.git \
-    && (cd python-mapnik \
-        && python3 setup.py install \
-        && git submodule update --init \
-        && python3 setup.py test)
+# RUN git clone --branch $PYTHON_MAPNIK_VERSION --single-branch --depth=1 https://github.com/mapnik/python-mapnik.git \
+#     && (cd python-mapnik \
+#         && python3 setup.py install \
+#         && git submodule update --init \
+#         && python3 setup.py test)
