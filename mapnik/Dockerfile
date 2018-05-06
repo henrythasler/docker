@@ -67,3 +67,5 @@ RUN cd python-mapnik \
 #         && python3 setup.py install \
 #         && git submodule update --init \
 #         && python3 setup.py test)
+
+RUN rm -rf /var/cache/apk/*
