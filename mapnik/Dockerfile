@@ -61,11 +61,21 @@ RUN cd python-mapnik \
 RUN cd python-mapnik \
     && python3 setup.py test || true
 
+WORKDIR /
+
+ENV USER=mapnik USER_ID=2000
+
+# now creating user
+RUN adduser -D -u ${USER_ID} ${USER}
+
+COPY user-mapping.sh /
+RUN  chmod u+x /user-mapping.sh
+ENTRYPOINT ["/user-mapping.sh"]
+
 # install python-bindings for mapnik from source
 # RUN git clone --branch $PYTHON_MAPNIK_VERSION --single-branch --depth=1 https://github.com/mapnik/python-mapnik.git \
 #     && (cd python-mapnik \
 #         && python3 setup.py install \
 #         && git submodule update --init \
 #         && python3 setup.py test)
-
 RUN rm -rf /var/cache/apk/*
