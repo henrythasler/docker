@@ -1,5 +1,4 @@
 FROM postgres:10-alpine
-MAINTAINER Régis Belson <me@regisbelson.fr>
 
 ENV POSTGIS_VERSION 2.4.3
 ENV POSTGIS_SHA256 b9754c7b9cbc30190177ec34b570717b2b9b88ed271d18e3af68eca3632d1d95
@@ -9,8 +8,8 @@ ENV SFCGAL_VERSION 1.3.5
 
 # prepare build environment
 RUN set -ex \
-    && mkdir -p /usr/src
-WORKDIR /usr/src
+    && mkdir -p /build
+WORKDIR /build
 
 RUN apk --update upgrade
 RUN apk add --no-cache --virtual .fetch-deps \
@@ -33,7 +32,7 @@ RUN apk add --no-cache --virtual .build-deps \
         gmp-dev \
         mpfr-dev
 
-RUN  apk add --no-cache --virtual .build-deps-testing \
+RUN apk add --no-cache --virtual .build-deps-testing \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
         gdal-dev \
         geos-dev \
@@ -70,18 +69,18 @@ RUN cp /usr/local/lib64/libSFCGAL.so* /lib
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
 
-# RUN apk add --no-cache --virtual .postgis-rundeps \
-#         json-c \
-#         gmp \
-#         mpfr3 \
-#     && apk add --no-cache --virtual .postgis-rundeps-testing \
-#         --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-#         geos \
-#         gdal \
-#         proj4 \
-#         protobuf-c \
-#     && cd / \
-#     && rm -rf /usr/src/postgis \
-#     && apk del .fetch-deps .build-deps .build-deps-testing
-
-#  ldd /usr/local/lib/postgresql/postgis-2.4.so 
+RUN apk add --no-cache --virtual .postgis-rundeps \
+        json-c \
+        gmp \
+        mpfr3 \
+        boost \
+        boost-serialization \
+    && apk add --no-cache --virtual .postgis-rundeps-testing \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+        geos \
+        gdal \
+        proj4 \
+        protobuf-c \
+    && cd / \
+    && rm -rf /build \
+    && apk del .fetch-deps .build-deps .build-deps-testing
