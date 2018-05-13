@@ -4,6 +4,8 @@ ENV POSTGIS_VERSION 2.4.3
 ENV POSTGIS_SHA256 b9754c7b9cbc30190177ec34b570717b2b9b88ed271d18e3af68eca3632d1d95
 
 ENV CGAL_VERSION 4.11.1
+ENV CGAL_SHA256 fb152fc30f007e5911922913f8dc38e0bb969b534373ca0fbe85b4d872300e8b
+
 ENV SFCGAL_VERSION 1.3.5
 
 # prepare build environment
@@ -40,6 +42,7 @@ RUN apk add --no-cache --virtual .build-deps-testing \
         protobuf-c-dev
 
 RUN wget -O cgal.tar.xz https://github.com/CGAL/cgal/releases/download/releases%2FCGAL-$CGAL_VERSION/CGAL-$CGAL_VERSION.tar.xz \
+    && echo "$CGAL_SHA256 *sfcgal.tar.gz" | sha256sum -c - \
     && tar xf cgal.tar.xz \
     && cd CGAL-$CGAL_VERSION \
     && cmake . -Wno-dev \
@@ -69,6 +72,7 @@ RUN cp /usr/local/lib64/libSFCGAL.so* /lib
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
 
+WORKDIR /
 RUN apk add --no-cache --virtual .postgis-rundeps \
         json-c \
         gmp \
