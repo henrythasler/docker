@@ -1,9 +1,10 @@
-FROM alpine:3.7
+FROM alpine:3.8
 
-RUN apk --update add unbound 
+RUN apk --update upgrade
+RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main unbound
 
 # maybe remove this after debugging is done
-RUN apk --update add wget bash nano
+RUN apk add wget bash nano
 
 # add specific config
 ADD unbound.conf /etc/unbound/unbound.conf
