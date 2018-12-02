@@ -24,8 +24,8 @@ RUN apk upgrade --update \
         pcre-dev \
         udns-dev \
         tar \
-        git
-RUN curl -sSLO https://c-ares.haxx.se/download/c-ares-$ARES_VERSION.tar.gz \
+        git \
+    && curl -sSLO https://c-ares.haxx.se/download/c-ares-$ARES_VERSION.tar.gz \
     && tar -zxf c-ares-$ARES_VERSION.tar.gz \
     && (cd c-ares-$ARES_VERSION \ 
         && ./configure \
@@ -40,14 +40,14 @@ RUN curl -sSLO https://c-ares.haxx.se/download/c-ares-$ARES_VERSION.tar.gz \
     && ( cd simple-obfs \
         && git submodule update --init --recursive \
         && ./autogen.sh && ./configure \
-        && make && make install )
-RUN curl -sSLO https://github.com/xtaci/kcptun/releases/download/v$KCP_VERSION/kcptun-linux-amd64-$KCP_VERSION.tar.gz \
+        && make && make install ) \
+    && curl -sSLO https://github.com/xtaci/kcptun/releases/download/v$KCP_VERSION/kcptun-linux-amd64-$KCP_VERSION.tar.gz \
     && tar -zxf kcptun-linux-amd64-$KCP_VERSION.tar.gz \
-&& mv server_linux_amd64 /usr/bin/kcpserver \
-&& mv client_linux_amd64 /usr/bin/kcpclient \
-&& ln -sf /usr/share/zoneinfo/$TZ /etc/localtime \
+    && mv server_linux_amd64 /usr/bin/kcpserver \
+    && mv client_linux_amd64 /usr/bin/kcpclient \
+    && ln -sf /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo $TZ > /etc/timezone \
-&& runDeps="$( \
+    && runDeps="$( \
         scanelf --needed --nobanner /usr/bin/ss-* /usr/local/bin/obfs-* \
             | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
             | xargs -r apk info --installed \
