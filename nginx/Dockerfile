@@ -16,7 +16,7 @@ RUN apk --update upgrade \
     linux-headers \
     libtool \
     build-base \
-    pcre-dev \
+#    pcre-dev \
     zlib-dev \
     wget \
     gnupg \
@@ -26,47 +26,47 @@ RUN apk --update upgrade \
     libc-dev \
     make \
     pkgconf \
-    curl-dev \
+#    curl-dev \
     ca-certificates \  
     # additional build packages              
-    freetype-dev \
-    openldap-dev \
-    gmp-dev \
-    icu-dev \
-    postgresql-dev \
-    libpng-dev \
-    libwebp-dev \
-    gd-dev \
-    libjpeg-turbo-dev \
-    libxpm-dev \
-    libedit-dev \
-    libxml2-dev \
-    libressl-dev \
-    libbz2 \
-    sqlite-dev \
-    imap-dev \
+#    freetype-dev \
+#    openldap-dev \
+#    gmp-dev \
+#    icu-dev \
+#    postgresql-dev \
+#    libpng-dev \
+#    libwebp-dev \
+#    gd-dev \
+#    libjpeg-turbo-dev \
+#    libxpm-dev \
+#    libedit-dev \
+#    libxml2-dev \
+#    libressl-dev \
+#    libbz2 \
+#    sqlite-dev \
+#    imap-dev \
     ### runtime packages
     && apk add --no-cache --virtual .run-deps \
     s6 \
     su-exec \
-    curl \
-    libedit \
-    libxml2 \
-    libressl \
-    libwebp \
-    gd \
-    pcre \
-    zlib \
-    freetype \
-    openldap \
-    gmp \
-    bzip2-dev \
-    icu \
-    libpq \
-    c-client
-
+#    curl \
+#    libedit \
+#    libxml2 \
+#    libressl \
+#    libwebp \
+#    gd \
+#    pcre \
+#    zlib \
+#    freetype \
+#    openldap \
+#    gmp \
+#    bzip2-dev \
+#    icu \
+#    libpq \
+#    c-client \
+#
 # GPG key for nginx (http://nginx.org/en/pgp_keys.html)
-RUN gpg --keyserver keys.internet-sicherheit.de --recv-key \
+    && gpg --keyserver keys.internet-sicherheit.de --recv-key \
         # Andrew Alexeev
         A09CD539B8BB8CBE96E82BDFABD4D3B3F5806B4D \
         # Igor Sysoev
@@ -91,31 +91,31 @@ RUN gpg --keyserver keys.internet-sicherheit.de --recv-key \
 #        
 # Philip Hazel's public GPG key for pcre (https://www.pcre.org/). 
     && gpg --keyserver keys.internet-sicherheit.de --recv-key \
-        45F68D54BBE23FB3039B46E59766E084FB0F43D8
-
+        45F68D54BBE23FB3039B46E59766E084FB0F43D8 \
+#        
 ### Source download, verify and extract
-RUN wget $NGINX_SOURCE$NGINX_VERSION.tar.gz -O /tmp/$NGINX_VERSION.tar.gz \
+    && wget $NGINX_SOURCE$NGINX_VERSION.tar.gz -O /tmp/$NGINX_VERSION.tar.gz \
     && wget $NGINX_SOURCE$NGINX_VERSION.tar.gz.asc -O /tmp/$NGINX_VERSION.tar.gz.asc \
     && gpg --verify /tmp/$NGINX_VERSION.tar.gz.asc \
     && mkdir -p /usr/src \
-    && tar xzf /tmp/$NGINX_VERSION.tar.gz -C /usr/src
-
+    && tar xzf /tmp/$NGINX_VERSION.tar.gz -C /usr/src \
+#
 ### Source download, verify and extract
-RUN wget $OPENSSL_SOURCE$OPENSSL_VERSION.tar.gz -O /tmp/$OPENSSL_VERSION.tar.gz \
+    && wget $OPENSSL_SOURCE$OPENSSL_VERSION.tar.gz -O /tmp/$OPENSSL_VERSION.tar.gz \
     && wget $OPENSSL_SOURCE$OPENSSL_VERSION.tar.gz.asc -O /tmp/$OPENSSL_VERSION.tar.gz.asc \
     && gpg --verify /tmp/$OPENSSL_VERSION.tar.gz.asc \
     && mkdir -p /usr/src \
-    && tar xzf /tmp/$OPENSSL_VERSION.tar.gz -C /usr/src
-
+    && tar xzf /tmp/$OPENSSL_VERSION.tar.gz -C /usr/src \
+#
 ### Source download, verify and extract
-RUN wget $PCRE_SOURCE$PCRE_VERSION.tar.gz -O /tmp/$PCRE_VERSION.tar.gz \
+    && wget $PCRE_SOURCE$PCRE_VERSION.tar.gz -O /tmp/$PCRE_VERSION.tar.gz \
     && wget $PCRE_SOURCE$PCRE_VERSION.tar.gz.sig -O /tmp/$PCRE_VERSION.tar.gz.asc \
     && gpg --verify /tmp/$PCRE_VERSION.tar.gz.asc \
     && mkdir -p /usr/src \
-    && tar xzf /tmp/$PCRE_VERSION.tar.gz -C /usr/src
-
+    && tar xzf /tmp/$PCRE_VERSION.tar.gz -C /usr/src \
+#
 ### nginx installation
-RUN cd /usr/src/$NGINX_VERSION \
+    && cd /usr/src/$NGINX_VERSION \
     && ./configure \
     --with-cc-opt="-O3 -fPIE -fstack-protector-strong" \
     --prefix=/nginx \
@@ -141,7 +141,7 @@ RUN cd /usr/src/$NGINX_VERSION \
     --without-http_browser_module \        
     && make -j $(getconf _NPROCESSORS_CONF) \
     && make install \
-    && apk del ${BUILD_DEPS} \
+    && apk del .build-deps \
     && rm -rf /tmp/* /var/cache/apk/* /usr/src/*
 
 COPY rootfs /
