@@ -10,6 +10,8 @@ ARG NGINX_SOURCE="https://nginx.org/download/"
 ARG OPENSSL_SOURCE="https://www.openssl.org/source/"
 ARG PCRE_SOURCE="https://ftp.pcre.org/pub/pcre/"
 
+COPY rootfs /
+
 RUN apk --update upgrade \
     && apk add --no-cache --virtual .build-deps \
     # basic build packages              
@@ -141,15 +143,15 @@ RUN apk --update upgrade \
     --without-http_browser_module \        
     && make -j $(getconf _NPROCESSORS_CONF) \
     && make install \
+#
+### Strip debug symbols, fix permissions, create missing directories
+    && { find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; } \
+    && chmod +x /usr/local/bin/* /etc/s6.d/*/* /etc/s6.d/.s6-svscan/* \
+    && mkdir -p /nginx/logs /nginx/run \
+#
+### clean up files
     && apk del .build-deps \
     && rm -rf /tmp/* /var/cache/apk/* /usr/src/*
-
-COPY rootfs /
-
-### Strip, clean, install modules
-RUN { find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; } \
-    && chmod +x /usr/local/bin/* /etc/s6.d/*/* /etc/s6.d/.s6-svscan/* \
-    && mkdir -p /nginx/logs /nginx/run
 
 ENV UID=991 GID=991 \
     UPLOAD_MAX_SIZE=1G
