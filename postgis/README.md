@@ -822,5 +822,270 @@ user	8m44,129s
 sys	2m14,403s
 ```
 
+## Testcase 5
+
+```
+autovacuum=off
+effective_io_concurrency=512
+fsync=off
+full_page_writes=on
+listen_addresses='*'
+maintenance_work_mem=4MB
+max_parallel_workers=12
+max_parallel_workers_per_gather=8
+max_wal_size=64MB
+max_worker_processes=8
+min_wal_size=32MB
+random_page_cost=1
+shared_buffers=1GB
+synchronous_commit=off
+work_mem=512MB
+```
+
+and `osm2pgsql with --number-processes 8`
+
+
+```
+DROP DATABASE
+WARNING:  there is no transaction in progress
+COMMIT
+CREATE DATABASE
+CREATE EXTENSION
+CREATE EXTENSION
+CREATE EXTENSION
+ALTER DATABASE
+osm2pgsql version 0.94.0 (64 bit id space)
+
+Using built-in tag processing pipeline
+Using projection SRS 3857 (Spherical Mercator)
+Setting up table: planet_osm_point
+Setting up table: planet_osm_line
+Setting up table: planet_osm_polygon
+Setting up table: planet_osm_roads
+Allocating memory for dense node cache
+Allocating dense node cache in one big chunk
+Allocating memory for sparse node cache
+Sharing dense sparse
+Node-cache: cache=12000MB, maxblocks=192000*65536, allocation method=11
+Mid: pgsql, cache=12000
+Setting up table: planet_osm_nodes
+Setting up table: planet_osm_ways
+Setting up table: planet_osm_rels
+
+Reading in file: /media/ramdisk/germany-south.osm.pbf
+Using PBF parser.
+Processing: Node(110950k 623.3k/s) Way(15859k 178.19k/s) Relation(237460 1224.02/s)  parse time: 462s
+Node stats: total(110950380), max(5469955348) in 178s
+Way stats: total(15859148), max(568578513) in 89s
+Relation stats: total(238778), max(8099669) in 194s
+Committing transaction for planet_osm_point
+Committing transaction for planet_osm_line
+Committing transaction for planet_osm_polygon
+Committing transaction for planet_osm_roads
+Setting up table: planet_osm_nodes
+Setting up table: planet_osm_ways
+Setting up table: planet_osm_rels
+Using built-in tag processing pipeline
+Setting up table: planet_osm_nodes
+Setting up table: planet_osm_ways
+Setting up table: planet_osm_rels
+Using built-in tag processing pipeline
+Setting up table: planet_osm_nodes
+Setting up table: planet_osm_ways
+Setting up table: planet_osm_rels
+Using built-in tag processing pipeline
+Setting up table: planet_osm_nodes
+Setting up table: planet_osm_ways
+Setting up table: planet_osm_rels
+Using built-in tag processing pipeline
+Setting up table: planet_osm_nodes
+Setting up table: planet_osm_ways
+Setting up table: planet_osm_rels
+Using built-in tag processing pipeline
+Setting up table: planet_osm_nodes
+Setting up table: planet_osm_ways
+Setting up table: planet_osm_rels
+Using built-in tag processing pipeline
+Setting up table: planet_osm_nodes
+Setting up table: planet_osm_ways
+Setting up table: planet_osm_rels
+Using built-in tag processing pipeline
+Setting up table: planet_osm_nodes
+Setting up table: planet_osm_ways
+Setting up table: planet_osm_rels
+Using built-in tag processing pipeline
+
+Going over pending ways...
+	11438514 ways are pending
+
+Using 8 helper-processes
+Finished processing 11438514 ways in 239 s
+
+11438514 Pending ways took 239s at a rate of 47859.89/s
+Committing transaction for planet_osm_point
+Committing transaction for planet_osm_line
+Committing transaction for planet_osm_polygon
+Committing transaction for planet_osm_roads
+Committing transaction for planet_osm_point
+Committing transaction for planet_osm_line
+Committing transaction for planet_osm_polygon
+Committing transaction for planet_osm_roads
+Committing transaction for planet_osm_point
+Committing transaction for planet_osm_line
+Committing transaction for planet_osm_polygon
+Committing transaction for planet_osm_roads
+Committing transaction for planet_osm_point
+Committing transaction for planet_osm_line
+Committing transaction for planet_osm_polygon
+Committing transaction for planet_osm_roads
+Committing transaction for planet_osm_point
+Committing transaction for planet_osm_line
+Committing transaction for planet_osm_polygon
+Committing transaction for planet_osm_roads
+Committing transaction for planet_osm_point
+Committing transaction for planet_osm_line
+Committing transaction for planet_osm_polygon
+Committing transaction for planet_osm_roads
+Committing transaction for planet_osm_point
+Committing transaction for planet_osm_line
+Committing transaction for planet_osm_polygon
+Committing transaction for planet_osm_roads
+Committing transaction for planet_osm_point
+Committing transaction for planet_osm_line
+Committing transaction for planet_osm_polygon
+Committing transaction for planet_osm_roads
+
+Going over pending relations...
+	0 relations are pending
+
+Using 8 helper-processes
+Finished processing 0 relations in 0 s
+
+Committing transaction for planet_osm_point
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_line
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_polygon
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_roads
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_point
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_line
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_polygon
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_roads
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_point
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_line
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_polygon
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_roads
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_point
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_line
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_polygon
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_roads
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_point
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_line
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_polygon
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_roads
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_point
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_line
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_polygon
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_roads
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_point
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_line
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_polygon
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_roads
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_point
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_line
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_polygon
+WARNING:  there is no transaction in progress
+Committing transaction for planet_osm_roads
+WARNING:  there is no transaction in progress
+Stopping table: planet_osm_nodes
+Sorting data and creating indexes for planet_osm_point
+Stopping table: planet_osm_ways
+Building index on table: planet_osm_ways
+Sorting data and creating indexes for planet_osm_line
+Stopping table: planet_osm_rels
+Building index on table: planet_osm_rels
+Sorting data and creating indexes for planet_osm_roads
+Sorting data and creating indexes for planet_osm_polygon
+Stopped table: planet_osm_nodes in 0s
+Copying planet_osm_roads to cluster by geometry finished
+Creating geometry index on planet_osm_roads
+Creating osm_id index on planet_osm_roads
+Creating indexes on planet_osm_roads finished
+All indexes on planet_osm_roads created in 11s
+Completed planet_osm_roads
+Copying planet_osm_point to cluster by geometry finished
+Creating geometry index on planet_osm_point
+Stopped table: planet_osm_rels in 15s
+Creating osm_id index on planet_osm_point
+Creating indexes on planet_osm_point finished
+All indexes on planet_osm_point created in 46s
+Completed planet_osm_point
+Copying planet_osm_line to cluster by geometry finished
+Creating geometry index on planet_osm_line
+Creating osm_id index on planet_osm_line
+Creating indexes on planet_osm_line finished
+All indexes on planet_osm_line created in 118s
+Completed planet_osm_line
+Stopped table: planet_osm_ways in 306s
+Copying planet_osm_polygon to cluster by geometry finished
+Creating geometry index on planet_osm_polygon
+Creating osm_id index on planet_osm_polygon
+Creating indexes on planet_osm_polygon finished
+All indexes on planet_osm_polygon created in 593s
+Completed planet_osm_polygon
+node cache: stored: 110950380(100.00%), storage efficiency: 50.16% (dense blocks: 436, sparse nodes: 108818382), hit rate: 99.66%
+
+Osm2pgsql took 1295s overall
+psql:postprocessing/cycleroutes.sql:1: NOTICE:  table "cycleroutes" does not exist, skipping
+DROP TABLE
+CREATE TABLE
+INSERT 0 1
+DROP TABLE
+psql:postprocessing/subway.sql:1: NOTICE:  table "subway" does not exist, skipping
+DROP TABLE
+CREATE TABLE
+INSERT 0 9
+psql:postprocessing/tram.sql:1: NOTICE:  table "tram" does not exist, skipping
+DROP TABLE
+CREATE TABLE
+INSERT 0 43
+psql:postprocessing/tram.sql:25: NOTICE:  table "tram_raw" does not exist, skipping
+DROP TABLE
+CREATE TABLE
+INSERT 0 43
+
+real	29m23,029s
+user	8m34,994s
+sys	2m36,102s
+```
+
 ## References
 * 
