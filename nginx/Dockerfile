@@ -12,13 +12,15 @@ ARG PCRE_SOURCE="https://ftp.pcre.org/pub/pcre/"
 
 COPY rootfs /
 
+### update apk and existing packages
 RUN apk --update upgrade \
+#
+### install dependencies
     && apk add --no-cache --virtual .build-deps \
-    # basic build packages              
+    ### basic build packages              
     linux-headers \
     libtool \
     build-base \
-#    pcre-dev \
     zlib-dev \
     wget \
     gnupg \
@@ -28,44 +30,11 @@ RUN apk --update upgrade \
     libc-dev \
     make \
     pkgconf \
-#    curl-dev \
     ca-certificates \  
-    # additional build packages              
-#    freetype-dev \
-#    openldap-dev \
-#    gmp-dev \
-#    icu-dev \
-#    postgresql-dev \
-#    libpng-dev \
-#    libwebp-dev \
-#    gd-dev \
-#    libjpeg-turbo-dev \
-#    libxpm-dev \
-#    libedit-dev \
-#    libxml2-dev \
-#    libressl-dev \
-#    libbz2 \
-#    sqlite-dev \
-#    imap-dev \
     ### runtime packages
     && apk add --no-cache --virtual .run-deps \
     s6 \
     su-exec \
-#    curl \
-#    libedit \
-#    libxml2 \
-#    libressl \
-#    libwebp \
-#    gd \
-#    pcre \
-#    zlib \
-#    freetype \
-#    openldap \
-#    gmp \
-#    bzip2-dev \
-#    icu \
-#    libpq \
-#    c-client \
 #
 # GPG key for nginx (http://nginx.org/en/pgp_keys.html)
     && gpg --keyserver keys.internet-sicherheit.de --recv-key \
@@ -95,31 +64,33 @@ RUN apk --update upgrade \
     && gpg --keyserver keys.internet-sicherheit.de --recv-key \
         45F68D54BBE23FB3039B46E59766E084FB0F43D8 \
 #        
-### Source download, verify and extract
+### NGINX: Source download, verify and extract
     && wget $NGINX_SOURCE$NGINX_VERSION.tar.gz -O /tmp/$NGINX_VERSION.tar.gz \
     && wget $NGINX_SOURCE$NGINX_VERSION.tar.gz.asc -O /tmp/$NGINX_VERSION.tar.gz.asc \
     && gpg --verify /tmp/$NGINX_VERSION.tar.gz.asc \
     && mkdir -p /usr/src \
     && tar xzf /tmp/$NGINX_VERSION.tar.gz -C /usr/src \
 #
-### Source download, verify and extract
+### OpenSSL: Source download, verify and extract
     && wget $OPENSSL_SOURCE$OPENSSL_VERSION.tar.gz -O /tmp/$OPENSSL_VERSION.tar.gz \
     && wget $OPENSSL_SOURCE$OPENSSL_VERSION.tar.gz.asc -O /tmp/$OPENSSL_VERSION.tar.gz.asc \
     && gpg --verify /tmp/$OPENSSL_VERSION.tar.gz.asc \
     && mkdir -p /usr/src \
     && tar xzf /tmp/$OPENSSL_VERSION.tar.gz -C /usr/src \
 #
-### Source download, verify and extract
+### PCRE: Source download, verify and extract
     && wget $PCRE_SOURCE$PCRE_VERSION.tar.gz -O /tmp/$PCRE_VERSION.tar.gz \
     && wget $PCRE_SOURCE$PCRE_VERSION.tar.gz.sig -O /tmp/$PCRE_VERSION.tar.gz.asc \
     && gpg --verify /tmp/$PCRE_VERSION.tar.gz.asc \
     && mkdir -p /usr/src \
     && tar xzf /tmp/$PCRE_VERSION.tar.gz -C /usr/src \
 #
-### nginx installation
+### nginx installation; use custom OpenSSL and PCRE
     && cd /usr/src/$NGINX_VERSION \
     && ./configure \
-    --with-cc-opt="-O3 -fPIE -fstack-protector-strong" \
+#    
+### https://security.stackexchange.com/questions/24444/what-is-the-most-hardened-set-of-options-for-gcc-compiling-c-c
+    --with-cc-opt="-O3 -fPIE -pie -fstack-protector-strong -D_FORTIFY_SOURCE=2 -Wl,-z,relro,-z,now" \
     --prefix=/nginx \
     --sbin-path=/usr/local/sbin/nginx \
     --http-log-path=/nginx/logs/access.log \
@@ -144,9 +115,13 @@ RUN apk --update upgrade \
     && make -j $(getconf _NPROCESSORS_CONF) \
     && make install \
 #
-### Strip debug symbols, fix permissions, create missing directories
+### Strip debug symbols from executables
     && { find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; } \
+#
+### fix permissions
     && chmod +x /usr/local/bin/* /etc/s6.d/*/* /etc/s6.d/.s6-svscan/* \
+#    
+### create missing directories        
     && mkdir -p /nginx/logs /nginx/run \
 #
 ### clean up files
