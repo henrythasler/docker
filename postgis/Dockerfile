@@ -1,90 +1,105 @@
-FROM postgres:10-alpine
+FROM postgres:11-alpine
 
-ENV POSTGIS_VERSION 2.4.3
-ENV POSTGIS_SHA256 b9754c7b9cbc30190177ec34b570717b2b9b88ed271d18e3af68eca3632d1d95
+### Versions
+ARG CGAL_VERSION="4.13"
+ARG SFCGAL_VERSION="1.3.6"
+ARG POSTGIS_VERSION="2.5.1"
 
-ENV CGAL_VERSION 4.11.1
-ENV CGAL_SHA256 fb152fc30f007e5911922913f8dc38e0bb969b534373ca0fbe85b4d872300e8b
+### Download Locations
+ARG CGAL_SOURCE="https://github.com/CGAL/cgal/releases/download/releases%2FCGAL-$CGAL_VERSION/CGAL-$CGAL_VERSION.tar.xz"
+ARG SFCGAL_SOURCE="https://github.com/Oslandia/SFCGAL/archive/v$SFCGAL_VERSION.tar.gz"
+ARG POSTGIS_SOURCE="https://download.osgeo.org/postgis/source/postgis-$POSTGIS_VERSION.tar.gz"
 
-ENV SFCGAL_VERSION 1.3.5
+### Checksums
+ARG CGAL_SHA256="3e3dd7a64febda58be54c3cbeba329ab6a73b72d4d7647ba4931ecd1fad0e3bc"
+#ARG POSTGIS_SHA256="b9754c7b9cbc30190177ec34b570717b2b9b88ed271d18e3af68eca3632d1d95"
 
-# prepare build environment
-RUN set -ex \
-    && mkdir -p /build
-WORKDIR /build
-
-RUN apk --update upgrade
-RUN apk add --no-cache --virtual .fetch-deps \
-        ca-certificates \
-        openssl \
-        tar \
-        xz
-
-RUN apk add --no-cache --virtual .build-deps \
-        autoconf \
-        automake \
-        g++ \
-        json-c-dev \
-        libtool \
-        libxml2-dev \
-        make \
-        perl \
+### update apk and existing packages
+RUN apk upgrade --update \
+#
+### install dependencies
+    && apk add --virtual .build-deps \
+        ### basic build packages              
+        build-base \
         cmake \
-        boost-dev \
+        wget \
+        ### additional build packages    
+        perl \
         gmp-dev \
-        mpfr-dev
-
-RUN apk add --no-cache --virtual .build-deps-testing \
+        mpfr-dev \
+        boost-dev \
+        libxml2-dev \
+    ### build packages from edge repo
+    && apk add --virtual .build-deps-edge \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
+        openssl-dev \
+    ### build packages from testing repo
+    && apk add --virtual .build-deps-testing \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
         gdal-dev \
         geos-dev \
         proj4-dev \
-        protobuf-c-dev
-
-RUN wget -O cgal.tar.xz https://github.com/CGAL/cgal/releases/download/releases%2FCGAL-$CGAL_VERSION/CGAL-$CGAL_VERSION.tar.xz \
-    && echo "$CGAL_SHA256 *sfcgal.tar.gz" | sha256sum -c - \
-    && tar xf cgal.tar.xz \
-    && cd CGAL-$CGAL_VERSION \
-    && cmake . -Wno-dev \
-    && make -j 4 \    
-    && make install
-
-RUN wget -O sfcgal.tar.gz "https://github.com/Oslandia/SFCGAL/archive/v$SFCGAL_VERSION.tar.gz" \
-    && tar xf sfcgal.tar.gz \
-    && cd SFCGAL-$SFCGAL_VERSION \
-    && cmake . -Wno-dev\
-    && make -j 4 \    
-    && make install
-
-
-RUN wget -O postgis.tar.gz "https://github.com/postgis/postgis/archive/$POSTGIS_VERSION.tar.gz" \
-    && echo "$POSTGIS_SHA256 *postgis.tar.gz" | sha256sum -c - \
-    && tar xf postgis.tar.gz \
-    && cd postgis-$POSTGIS_VERSION \
-    && ./autogen.sh \
-    && ./configure \
-    && make -j 4\
-    && make install
-
-# FIXME - find a way to make /usr/local/lib64 a valid location for shared libraries
-RUN cp /usr/local/lib64/libSFCGAL.so* /lib
-
-COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/postgis.sh
-COPY ./update-postgis.sh /usr/local/bin
-
-WORKDIR /
-RUN apk add --no-cache --virtual .postgis-rundeps \
-        json-c \
-        gmp \
-        mpfr3 \
-        boost \
-        boost-serialization \
-    && apk add --no-cache --virtual .postgis-rundeps-testing \
+        protobuf-c-dev \
+    ### various runtime packages 
+    && apk add --virtual .postgis-run-deps-edge \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
+        openssl \
+    && apk add --virtual .postgis-run-deps-testing \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
         geos \
         gdal \
         proj4 \
         protobuf-c \
-    && cd / \
-    && rm -rf /build \
-    && apk del .fetch-deps .build-deps .build-deps-testing
+    && apk add --virtual .postgis-run-deps \
+        json-c \
+        gmp \
+        mpfr3 \
+        boost \
+        boost-serialization \
+#
+### CGAL: Source download, verify and extract
+    && wget $CGAL_SOURCE -O /tmp/CGAL-$CGAL_VERSION.tar.xz \
+    && echo "$CGAL_SHA256  /tmp/CGAL-$CGAL_VERSION.tar.xz" | sha256sum -c - \
+    && mkdir -p /usr/src \
+    && tar xf /tmp/CGAL-$CGAL_VERSION.tar.xz -C /usr/src \
+#
+### SFCGAL: Source download, verify and extract
+    && wget $SFCGAL_SOURCE -O /tmp/SFCGAL-$SFCGAL_VERSION.tar.gz \
+    && mkdir -p /usr/src \
+    && tar xzf /tmp/SFCGAL-$SFCGAL_VERSION.tar.gz -C /usr/src \
+#
+### postgis: Source download, verify and extract
+    && wget $POSTGIS_SOURCE -O /tmp/postgis-$POSTGIS_VERSION.tar.gz \
+    # && echo "$POSTGIS_SHA256  /tmp/postgis-$POSTGIS_VERSION.tar.gz" | sha256sum -c - \
+    && mkdir -p /usr/src \
+    && tar xzf /tmp/postgis-$POSTGIS_VERSION.tar.gz -C /usr/src \
+#
+### CGAL installation
+    && cd /usr/src/CGAL-${CGAL_VERSION} \
+    && cmake . -Wno-dev \
+    && make -j $(nproc) \
+    && make install \
+#
+### SFCGAL installation
+    && cd /usr/src/SFCGAL-${SFCGAL_VERSION} \
+    && cmake . -Wno-dev -Wno-deprecated -Wdeprecated-declarations \
+    && make -j $(nproc) \
+    && make install \
+#
+### postgis installation
+    && cd /usr/src/postgis-${POSTGIS_VERSION} \
+    && ./autogen.sh \
+    && ./configure \
+		--disable-gtktest \
+    && make -j $(nproc) \
+    && make install \
+#
+### clean up files
+    && apk del .build-deps .build-deps-edge .build-deps-testing \
+    && rm -rf /tmp/* /var/cache/apk/* /usr/src/* \
+#
+# FIXME - find a way to make postgis use /usr/local/lib64 as location for SFCGAL libraries
+    && ln -s /usr/local/lib64/libSFCGAL.so* /usr/local/lib/
+
+COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/postgis.sh
+COPY ./update-postgis.sh /usr/local/bin
