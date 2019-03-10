@@ -1,13 +1,13 @@
 ### build environment
 FROM golang:1.11.0-alpine3.8 AS build
 
-#ARG TEGOLA_VERSION="integrate_geom_makevalid"
+ARG TEGOLA_VERSION="integrate_geom_makevalid"
 #ARG TEGOLA_VERSION="master"
 #ARG TEGOLA_VERSION="henry"
-ARG TEGOLA_VERSION="v0.9.x"
+#ARG TEGOLA_VERSION="v0.9.x"
 
-ARG TEGOLA_SOURCE="https://github.com/henrythasler/tegola.git"
-#ARG TEGOLA_SOURCE="https://github.com/go-spatial/tegola.git"
+#ARG TEGOLA_SOURCE="https://github.com/henrythasler/tegola.git"
+ARG TEGOLA_SOURCE="https://github.com/go-spatial/tegola.git"
 
 ARG TEGOLA_BUILDFLAGS="-w -X github.com/go-spatial/tegola/cmd/tegola/cmd.Version=${TEGOLA_VERSION}"
 
@@ -23,13 +23,19 @@ RUN apk upgrade --update &&\
 RUN mkdir -p /go/src/github.com/go-spatial
 
 #COPY tegola /go/src/github.com/go-spatial/tegola/
-RUN cd /go/src/github.com/go-spatial/ &&\
+RUN cd /go/src/github.com/go-spatial &&\
     git clone --branch $TEGOLA_VERSION --depth 1 $TEGOLA_SOURCE tegola
     
 ### additional dependency geom: source download
 RUN cd /go/src/github.com/go-spatial &&\
     rm -rf geom &&\
-    git clone --branch gdey_delaunay --depth 1 https://github.com/go-spatial/geom.git geom
+    git clone --branch gdey_delaunay --depth 10 https://github.com/go-spatial/geom.git geom &&\
+    cd geom &&\
+    git checkout c39528f .
+
+### another dependency
+RUN cd /go/src/github.com &&\
+    git clone --branch master --depth 1 https://github.com/mattn/go-sqlite3.git mattn/go-sqlite3
 
 ### tegola: build + install
 RUN cd /go/src/github.com/go-spatial/tegola/cmd/tegola &&\
