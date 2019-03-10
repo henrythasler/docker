@@ -1,8 +1,8 @@
 ### build environment
 FROM golang:1.11.0-alpine3.8 AS build
 
-ARG TEGOLA_VERSION="integrate_geom_makevalid"
-#ARG TEGOLA_VERSION="master"
+#ARG TEGOLA_VERSION="integrate_geom_makevalid"
+ARG TEGOLA_VERSION="master"
 
 ARG TEGOLA_SOURCE="https://github.com/go-spatial/tegola.git"
 ARG TEGOLA_BUILDFLAGS="-w -X github.com/go-spatial/tegola/cmd/tegola/cmd.Version=${TEGOLA_VERSION}"
@@ -19,11 +19,7 @@ RUN apk upgrade --update &&\
 RUN mkdir -p /go/src/github.com/go-spatial &&\
     cd /go/src/github.com/go-spatial &&\
     git clone --branch $TEGOLA_VERSION --depth 1 $TEGOLA_SOURCE tegola
-    
-### additional dependency geom: source download
-RUN cd /go/src/github.com/go-spatial &&\
-    git clone --branch gdey_delaunay --depth 1 https://github.com/go-spatial/geom.git geom
-
+ 
 ### tegola: build + install
 RUN cd /go/src/github.com/go-spatial/tegola/cmd/tegola &&\
     go build -v -ldflags "$TEGOLA_BUILDFLAGS" -gcflags "-N -l" -o /opt/tegola &&\
