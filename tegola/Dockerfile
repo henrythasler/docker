@@ -29,13 +29,22 @@ RUN cd /go/src/github.com/go-spatial &&\
 ### additional dependency geom: source download
 RUN cd /go/src/github.com/go-spatial &&\
     rm -rf geom &&\
-    git clone --branch gdey_delaunay --depth 10 https://github.com/go-spatial/geom.git geom &&\
-    cd geom &&\
-    git checkout c39528f .
+    git clone --branch gdey_delaunay --depth 1 https://github.com/go-spatial/geom.git geom
+#     &&\
+#    cd geom &&\
+#    git checkout 8e1cc63 .
 
 ### another dependency
 RUN cd /go/src/github.com &&\
     git clone --branch master --depth 1 https://github.com/mattn/go-sqlite3.git mattn/go-sqlite3
+
+### and another one
+RUN cd /go/src/github.com &&\
+    git clone --branch master --depth 1 https://github.com/pborman/uuid.git pborman/uuid
+
+### just one more...
+RUN cd /go/src/github.com &&\
+    git clone --branch master --depth 1 https://github.com/google/uuid.git google/uuid
 
 ### tegola: build + install
 RUN cd /go/src/github.com/go-spatial/tegola/cmd/tegola &&\
