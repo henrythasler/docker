@@ -1,9 +1,9 @@
 FROM postgres:11-alpine
 
 ### Versions
-ARG CGAL_VERSION="4.13"
+ARG CGAL_VERSION="4.13.1"
 ARG SFCGAL_VERSION="1.3.6"
-ARG POSTGIS_VERSION="2.5.1"
+ARG POSTGIS_VERSION="2.5.2"
 
 ### Download Locations
 ARG CGAL_SOURCE="https://github.com/CGAL/cgal/releases/download/releases%2FCGAL-$CGAL_VERSION/CGAL-$CGAL_VERSION.tar.xz"
@@ -11,7 +11,7 @@ ARG SFCGAL_SOURCE="https://github.com/Oslandia/SFCGAL/archive/v$SFCGAL_VERSION.t
 ARG POSTGIS_SOURCE="https://download.osgeo.org/postgis/source/postgis-$POSTGIS_VERSION.tar.gz"
 
 ### Checksums
-ARG CGAL_SHA256="3e3dd7a64febda58be54c3cbeba329ab6a73b72d4d7647ba4931ecd1fad0e3bc"
+ARG CGAL_SHA256="3956225817967e047aa099e06e73e1d3c2fe8aae1ae5b672e470fb34c589c32f"
 #ARG POSTGIS_SHA256="b9754c7b9cbc30190177ec34b570717b2b9b88ed271d18e3af68eca3632d1d95"
 
 ### update apk and existing packages
