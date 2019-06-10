@@ -36,9 +36,7 @@ RUN apk upgrade --update \
     ### build packages from testing repo
     && apk add --virtual .build-deps-testing \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-        gdal-dev \
         geos-dev \
-        proj4-dev \
         protobuf-c-dev \
     ### various runtime packages 
     && apk add --virtual .postgis-run-deps-edge \
@@ -47,8 +45,8 @@ RUN apk upgrade --update \
     && apk add --virtual .postgis-run-deps-testing \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
         geos \
-        gdal \
-        proj4 \
+        gdal-dev \
+        proj4-dev \
         protobuf-c \
     && apk add --virtual .postgis-run-deps \
         json-c \
