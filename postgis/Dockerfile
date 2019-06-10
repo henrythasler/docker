@@ -1,4 +1,4 @@
-FROM postgres:11-alpine
+FROM postgres:11.3-alpine
 
 ### Versions
 ARG CGAL_VERSION="4.13.1"
