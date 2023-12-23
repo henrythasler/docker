@@ -1,0 +1,19 @@
+services:
+  mosquitto:
+    image: "eclipse-mosquitto:2.0.18"
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "8883:8883"
+    volumes:
+      - /home/henry/services/mosquitto/entrypoint.sh:/docker-entrypoint.sh:ro
+      - mqttdata:/mosquitto/data
+      - /home/henry/services/mosquitto/config/:/mosquitto/config/:ro
+      - certdata:/acme.sh:z
+
+volumes:
+  mqttdata:
+    name: mosquitto_data
+  certdata:
+    name: tls_certificates
+    external: true

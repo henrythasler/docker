@@ -1,0 +1,37 @@
+services:
+  postfix:
+    image: "postfix:alpine"
+    container_name: postfix
+    restart: unless-stopped
+    networks:
+      postfix:
+        ipv4_address: 172.20.0.1
+        ipv6_address: 2001::25
+    ports:
+      - "25:25"
+    volumes:
+      - /home/henry/services/postfix/entrypoint.sh:/usr/local/bin/entrypoint.sh:ro
+      - /home/henry/services/postfix/custom:/custom
+      - certdata:/acme.sh:z
+    environment:
+      - MYHOSTNAME=mail.domain.com
+      - VIRTUAL_ALIAS_DOMAINS=domain.com
+      - MYNETWORKS=127.0.0.0/8 172.20.0.0/16 [::1]/128 [fe80::]/10 [2001::]/80
+      - KEY=/acme.sh/domain.com_ecc/domain.com.key
+      - CERT=/acme.sh/domain.com_ecc/fullchain.cer
+      - CA=/acme.sh/domain.com_ecc/ca.cer
+
+volumes:
+  certdata:
+    name: tls_certificates
+    external: true
+
+networks:
+  postfix:
+    name: postfix
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+        - subnet: 2001::/80
