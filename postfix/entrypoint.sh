@@ -68,13 +68,14 @@ set_main smtpd_sender_restrictions "reject_unknown_sender_domain, check_recipien
 set_main smtpd_relay_restrictions "permit_mynetworks permit_sasl_authenticated reject_unauth_destination"
 set_main smtpd_recipient_restrictions "permit_mynetworks, check_policy_service unix:private/policyd-spf"
 set_main smtpd_data_restrictions "reject_unauth_pipelining"
+set_main smtpd_discard_ehlo_keywords "chunking, silent-discard" # see https://www.postfix.org/smtp-smuggling.html
 
 set_main disable_vrfy_command "yes"
 
 #postconf -p | grep _tls_
 
 echo
-echo '## NETWORK ##'
+echo '## NETWORK INFO ##'
 ip a
 ip r
 

@@ -10,9 +10,16 @@ services:
     ports:
       - "25:25"
     volumes:
-      - /home/henry/services/postfix/entrypoint.sh:/usr/local/bin/entrypoint.sh:ro
-      - /home/henry/services/postfix/custom:/custom
-      - certdata:/acme.sh:z
+      - type: bind
+        source: ./entrypoint.sh
+        target: /usr/local/bin/entrypoint.sh
+        read_only: true
+      - type: bind
+        source: ./custom
+        target: /custom
+      - type: volume
+        source: certdata
+        target: /acme.sh
     environment:
       - MYHOSTNAME=mail.domain.com
       - VIRTUAL_ALIAS_DOMAINS=domain.com
