@@ -6,9 +6,10 @@ services:
     networks:
       postfix:
         ipv4_address: 172.20.0.1
-        ipv6_address: 2001::25
+        ipv6_address: 2001:db8::25
     ports:
       - "25:25"
+      - "127.0.0.1:8587:587"      
     volumes:
       - type: bind
         source: ./entrypoint.sh
@@ -23,7 +24,10 @@ services:
     environment:
       - MYHOSTNAME=mail.domain.com
       - VIRTUAL_ALIAS_DOMAINS=domain.com
-      - MYNETWORKS=127.0.0.0/8 172.20.0.0/16 [::1]/128 [fe80::]/10 [2001::]/80
+      - MYDOMAIN=domain.com
+      - SASL_USER=${SASL_USER}
+      - SASL_PASS=${SASL_PASS}      
+      - MYNETWORKS=127.0.0.0/8 172.20.0.0/16 [::1]/128 [fe80::]/10 [2001:db8::]/80
       - KEY=/acme.sh/domain.com_ecc/domain.com.key
       - CERT=/acme.sh/domain.com_ecc/fullchain.cer
       - CA=/acme.sh/domain.com_ecc/ca.cer
@@ -41,4 +45,4 @@ networks:
       driver: default
       config:
         - subnet: 172.20.0.0/16
-        - subnet: 2001::/80
+        - subnet: 2001:db8::/80

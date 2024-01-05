@@ -19,6 +19,9 @@ echo "policyd-spf  unix  -       n       n       -       0       spawn user=nobo
 postconf -Mf policyd-spf
 set_main policyd-spf_time_limit "3600"
 
+# enable mail submission
+postconf -M submission/inet="submission inet n - n - - smtpd -o syslog_name=postfix/submission -o smtpd_tls_security_level=encrypt -o smtpd_sasl_auth_enable=yes -o smtpd_tls_auth_only=yes -o smtpd_reject_unlisted_recipient=no -o smtpd_recipient_restrictions=permit_sasl_authenticated,reject -o milter_macro_daemon_name=ORIGINATING"
+
 # create lookup tables
 postmap lmdb:/custom/spam_block
 postmap lmdb:/custom/virtual
@@ -26,6 +29,9 @@ postalias /etc/postfix/aliases
 
 # server settings
 set_main myhostname "${MYHOSTNAME}"
+set_main mydomain "${MYDOMAIN}"
+set_main myorigin "$mydomain"
+
 set_main smtpd_banner "\$myhostname ESMTP \$mail_name"
 set_main mydestination "server.com, localhost"
 set_main message_size_limit "40000000"
@@ -49,6 +55,7 @@ set_main tls_random_source "dev:/dev/urandom"
 
 # TLS for incoming connections
 set_main smtpd_tls_security_level "may"
+set_main smtpd_tls_auth_only "yes"
 set_main smtpd_tls_key_file "${KEY}"
 set_main smtpd_tls_cert_file "${CERT}"
 set_main smtpd_tls_CAfile "${CA}"
@@ -72,10 +79,18 @@ set_main smtpd_discard_ehlo_keywords "chunking, silent-discard" # see https://ww
 
 set_main disable_vrfy_command "yes"
 
+# smtp authentication for outgoing emails
+mkdir /etc/sasl2
+echo "${SASL_PASS}" | saslpasswd2 -p -c -u ${MYDOMAIN} ${SASL_USER}
+chmod go=r /etc/sasl2/sasldb2
+set_main smtpd_sasl_auth_enable "yes"
+set_main smtpd_sasl_path "smtpd"
+set_main cyrus_sasl_config_path "/custom/"
+
 #postconf -p | grep _tls_
 
 echo
-echo '## NETWORK INFO ##'
+echo '## NETWORK ##'
 ip a
 ip r
 
